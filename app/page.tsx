@@ -497,7 +497,7 @@ export default function BirthdayPage() {
                   exit={{ opacity: 0 }}
                   className="mt-6 text-[#4a3b32] font-black text-xl tracking-wider text-center uppercase"
                 >
-                  HAPPY BIRTHDAY!
+                  HEPI BIRTHDAY!
                 </motion.p>
               ) : isPopped ? (
                 <motion.p
@@ -507,7 +507,7 @@ export default function BirthdayPage() {
                   transition={{ delay: 1, duration: 2 }}
                   className="mt-6 text-white/70 font-medium text-lg tracking-widest text-center"
                 >
-                  Happy Birthday... Till.
+                  happy birthday... till.
                 </motion.p>
               ) : null}
             </AnimatePresence>
