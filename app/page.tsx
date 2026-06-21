@@ -250,8 +250,8 @@ export default function BirthdayPage() {
   const [isPopped, setIsPopped] = useState(false);
 
   // FIX: Ubah ke tipe 'any' supaya aman dilempar ke komponen anaknya
-  const containerRef = useRef<any>(null); 
-  const giftSfxRef = useRef<HTMLAudioElement | null>(null); 
+  const containerRef = useRef<any>(null);
+  const giftSfxRef = useRef<HTMLAudioElement | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const sfxRef = useRef<HTMLAudioElement | null>(null);
@@ -444,7 +444,7 @@ export default function BirthdayPage() {
                     className="absolute top-0 left-1 w-24 h-24 object-contain"
                     animate={{ rotate: 360 }}
                     transition={{
-                      duration: 3, 
+                      duration: 3,
                       repeat: Infinity,
                       ease: "linear"
                     }}
@@ -463,7 +463,7 @@ export default function BirthdayPage() {
                 gl={{ antialias: true, powerPreference: "high-performance", alpha: true }}
               >
                 <ambientLight intensity={isPopped ? 0.3 : 1.5} color="#ffffff" />
-                {!isPopped && <hemisphereLight skyColor="#ffffff" groundColor="#ffebef" intensity={1.5} />}
+                <hemisphereLight args={['#ffffff', '#ffebef', 1.5]} />
 
                 <directionalLight position={[0, 10, 10]} intensity={isPopped ? 0 : 2} />
                 <directionalLight position={[10, 10, 5]} intensity={isPopped ? 0.2 : 1.5} />
