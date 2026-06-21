@@ -154,14 +154,13 @@ function CameraController({ isTransitioning }: { isTransitioning: boolean }) {
 
       const targetLook = new THREE.Vector3(0, 0, 0);
       if (state.controls && 'target' in state.controls) {
-  (state.controls as any).target.lerp(targetLook, 0.04);
-}
+        (state.controls as any).target.lerp(targetLook, 0.04);
+      }
     }
   });
 
   return null;
 }
-
 
 // ==========================================
 // 5. KOMPONEN DEKORASI GANTUNGAN (BUNTING)
@@ -197,7 +196,8 @@ function BuntingBanner({ isPopped }: { isPopped: boolean }) {
 // ==========================================
 // 6. KOMPONEN PNG JATUH (BISA DISENTUH/DRAG)
 // ==========================================
-function FallingToys({ constraintsRef }: { constraintsRef: React.RefObject<HTMLElement> }) {
+// FIX: Ubah constraintsRef jadi any biar TypeScript gak berantem sama Framer Motion
+function FallingToys({ constraintsRef }: { constraintsRef: any }) {
   const toys = ['/toy1.png', '/toy2.png', '/toy3.png'];
 
   // Posisi akhir mainan pas mencar (Kiri, Tengah-Bawah, Kanan)
@@ -249,11 +249,10 @@ export default function BirthdayPage() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isPopped, setIsPopped] = useState(false);
 
-  // Tambahin 2 baris ini:
-  const containerRef = useRef<HTMLElement>(null); // Buat nahan PNG biar mentok layar
-  const giftSfxRef = useRef<HTMLAudioElement | null>(null); // SFX pas kado ditekan
+  // FIX: Ubah ke tipe 'any' supaya aman dilempar ke komponen anaknya
+  const containerRef = useRef<any>(null); 
+  const giftSfxRef = useRef<HTMLAudioElement | null>(null); 
 
-  // Ini bawaan lu sebelumnya:
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const sfxRef = useRef<HTMLAudioElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -272,16 +271,16 @@ export default function BirthdayPage() {
   }, [isOpen, isPopped, is3DLoaded]);
 
   const handleOpen = () => {
-    // Tambahin blok ini buat SFX kado
     if (giftSfxRef.current) {
       giftSfxRef.current.currentTime = 0;
-      giftSfxRef.current.play();
+      // FIX: Tambahin catch buat ngamanin promise rejection
+      giftSfxRef.current.play().catch((e) => console.log("Audio block: ", e));
     }
 
     setIsOpen(true);
     document.body.style.cursor = 'auto';
     if (audioRef.current) {
-      audioRef.current.play();
+      audioRef.current.play().catch((e) => console.log("Audio block: ", e));
       setIsPlaying(true);
     }
   };
@@ -289,13 +288,15 @@ export default function BirthdayPage() {
   const toggleMusic = () => {
     if (audioRef.current) {
       if (isPlaying) audioRef.current.pause();
-      else audioRef.current.play();
+      else audioRef.current.play().catch((e) => console.log("Audio block: ", e));
       setIsPlaying(!isPlaying);
     }
   };
 
   const handleCharaClick = (e: any) => {
-    e.stopPropagation();
+    if (e && typeof e.stopPropagation === 'function') {
+      e.stopPropagation();
+    }
     if (isPopped || isTransitioning) return;
 
     setIsTransitioning(true);
@@ -308,7 +309,7 @@ export default function BirthdayPage() {
 
     if (sfxRef.current) {
       sfxRef.current.currentTime = 0;
-      sfxRef.current.play();
+      sfxRef.current.play().catch((e) => console.log("Audio block: ", e));
     }
 
     confetti({
@@ -321,12 +322,12 @@ export default function BirthdayPage() {
     // Langsung transisi ke MV setelah 2.2 detik
     setTimeout(() => {
       setIsPopped(true);
-      // FIX: Lepas kunci transisi biar kameranya bebas muter lagi dikendalikan OrbitControls
       setIsTransitioning(false);
 
       if (videoRef.current) {
         videoRef.current.volume = 1.0;
-        videoRef.current.play().catch(e => console.error("Auto-play prevented", e));
+        // FIX: Kasih optional chaining "?" jaga-jaga kalau ref tiba-tiba ilang dari DOM
+        videoRef.current?.play()?.catch((e) => console.error("Auto-play prevented", e));
       }
     }, 2200);
   };
@@ -437,14 +438,13 @@ export default function BirthdayPage() {
             <AnimatePresence>
               {is3DLoaded && !isPopped && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                  {/* FIX: Ubah icon jadi tag img PNG */}
                   <motion.img
                     src="/sparkles.png"
                     alt="sparkles"
                     className="absolute top-0 left-1 w-24 h-24 object-contain"
                     animate={{ rotate: 360 }}
                     transition={{
-                      duration: 3, // Kecepatan putaran (detik), makin kecil makin ngebut
+                      duration: 3, 
                       repeat: Infinity,
                       ease: "linear"
                     }}
@@ -479,8 +479,6 @@ export default function BirthdayPage() {
 
                 <CameraController isTransitioning={isTransitioning} />
 
-                {/* FIX: Pas isTransitioning jalan, dia mati biar kameranya bisa ditarik mulus ke atas. 
-                    Pas isPopped (sad mode), dia nyala muter kaya ban dengan speed lambat (0.5) */}
                 <OrbitControls
                   makeDefault
                   autoRotate={!isTransitioning}
