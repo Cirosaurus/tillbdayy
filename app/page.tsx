@@ -153,7 +153,9 @@ function CameraController({ isTransitioning }: { isTransitioning: boolean }) {
       camera.position.lerp(targetPos, 0.04);
 
       const targetLook = new THREE.Vector3(0, 0, 0);
-      state.controls?.target.lerp(targetLook, 0.04);
+      if (state.controls && 'target' in state.controls) {
+  (state.controls as any).target.lerp(targetLook, 0.04);
+}
     }
   });
 
